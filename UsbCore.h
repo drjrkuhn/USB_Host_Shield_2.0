@@ -145,6 +145,10 @@ public:
                 return;
         } // Note used for hubs only!
 
+		virtual bool DEVDESCRIPTOROK(const USB_DEVICE_DESCRIPTOR& udd) {
+			return true;
+        }
+
         virtual bool VIDPIDOK(uint16_t vid, uint16_t pid) {
                 return false;
         }
