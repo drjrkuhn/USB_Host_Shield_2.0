@@ -709,10 +709,14 @@ uint8_t USB::Configuring(uint8_t parent, uint8_t port, bool lowspeed) {
         // VID/PID & class tests default to false for drivers not yet ported
         // subclass defaults to true, so you don't have to define it if you don't have to.
         //
-        for(devConfigIndex = 0; devConfigIndex < USB_NUMDEVICES; devConfigIndex++) {
+		// Subclasses may also check the Device Descriptor before the VID/PID & class is checked. 
+		// A subclass may reject a device descriptor directly, keep a copy of relevant udd data.
+		// The DEVDESCRIPTOROK test defaults to true.
+		//
+		for (devConfigIndex = 0; devConfigIndex < USB_NUMDEVICES; devConfigIndex++) {
                 if(!devConfig[devConfigIndex]) continue; // no driver
                 if(devConfig[devConfigIndex]->GetAddress()) continue; // consumed
-                if(devConfig[devConfigIndex]->DEVSUBCLASSOK(subklass) && (devConfig[devConfigIndex]->VIDPIDOK(vid, pid) || devConfig[devConfigIndex]->DEVCLASSOK(klass))) {
+				if (devConfig[devConfigIndex]->DEVDESCRIPTOROK(*udd) && devConfig[devConfigIndex]->DEVSUBCLASSOK(subklass) && (devConfig[devConfigIndex]->VIDPIDOK(vid, pid) || devConfig[devConfigIndex]->DEVCLASSOK(klass))) {
                         rcode = AttemptConfig(devConfigIndex, parent, port, lowspeed);
                         if(rcode != USB_DEV_CONFIG_ERROR_DEVICE_NOT_SUPPORTED)
                                 break;
